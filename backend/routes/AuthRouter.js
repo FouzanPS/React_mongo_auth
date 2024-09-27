@@ -1,12 +1,12 @@
 import { Router } from "express";
 import { loginValidation, signupValidation } from '../middlewares/AuthValidation.js';
-import signup from "../controllers/AuthController.js";
+import { signup, login } from "../controllers/AuthController.js";
+signup
 
 const router = Router()
 
-router.post('/login', (req, res) => {
-    res.send("login successfull");
-})
+
+router.post('/login', loginValidation, login)
 
 router.post('/signup', signupValidation, signup)
 
