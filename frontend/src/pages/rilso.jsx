@@ -1,44 +1,36 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
-import { handleError } from "../../util";
+import { ToastContainer, toast } from "react-toastify";
+import axios from "axios";
 
 function Signup() {
-  const [signupInfo, setSignupInfo] = useState({
+  const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
   });
 
+  const { name, email, password } = formData;
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, value);
-    const copySignupInfo = { ...signupInfo };
-    copySignupInfo[name] = value;
-    setSignupInfo(copySignupInfo);
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, email, password } = signupInfo;
-    if (!name || !email || !password) {
-      return handleError("name, email and password are required");
-    }
     try {
-      const url = `http://localhost:3000/auth/signup`;
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(signupInfo),
-      });
-      const result = await response.json();
-      console.log(result);
-    } catch (err) {
-      handleError(err);
+      const response = await axios.post("http://localhost:3000/auth/signup", formData);
+      if (response.data.success) {
+        toast.success("Signup successful!");
+      }
+    } catch (error) {
+      toast.error("Signup failed: " + (error.response?.data?.message || "Internal server error"));
     }
   };
+
   return (
     <div>
       <div className="h-[100vh] items-center flex justify-center px-5 lg:px-0">
@@ -54,12 +46,8 @@ function Signup() {
           <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
             <div className="flex flex-col items-center">
               <div className="text-center">
-                <h1 className="text-2xl xl:text-4xl font-extrabold text-blue-900">
-                  Sign up
-                </h1>
-                <p className="text-[12px] text-gray-500">
-                  Enter your details to create your account
-                </p>
+                <h1 className="text-2xl xl:text-4xl font-extrabold text-blue-900">Sign up</h1>
+                <p className="text-[12px] text-gray-500">Enter your details to create your account</p>
               </div>
               <form className="w-full" onSubmit={handleSubmit}>
                 <div className="w-full flex-1 mt-8">
@@ -68,7 +56,7 @@ function Signup() {
                       className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                       type="text"
                       name="name"
-                      value={signupInfo.name}
+                      value={name}
                       onChange={handleChange}
                       autoFocus
                       placeholder="Enter your name"
@@ -78,7 +66,7 @@ function Signup() {
                       className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                       type="email"
                       name="email"
-                      value={signupInfo.email}
+                      value={email}
                       onChange={handleChange}
                       placeholder="Enter your email"
                       required
@@ -87,7 +75,7 @@ function Signup() {
                       className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                       type="password"
                       name="password"
-                      value={signupInfo.password}
+                      value={password}
                       onChange={handleChange}
                       placeholder="Password"
                       required
@@ -113,9 +101,7 @@ function Signup() {
                     <p className="mt-6 text-xs text-gray-600 text-center">
                       Already have an account?{" "}
                       <a href="/login">
-                        <span className="text-blue-900 font-semibold">
-                          Login
-                        </span>
+                        <span className="text-blue-900 font-semibold">Login</span>
                       </a>
                     </p>
                   </div>
