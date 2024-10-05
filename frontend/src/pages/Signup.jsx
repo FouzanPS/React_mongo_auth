@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import { handleError } from "../../util";
+import { handleError, handleSuccess } from "../../util";
 
 function Signup() {
   const [signupInfo, setSignupInfo] = useState({
@@ -9,6 +9,8 @@ function Signup() {
     email: "",
     password: "",
   });
+
+  const navigate = useNavigate(); //It's initiated here to navigate to login page after signup
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,6 +36,18 @@ function Signup() {
         body: JSON.stringify(signupInfo),
       });
       const result = await response.json();
+      const { message, success, error } = result;
+      if (success) {
+        handleSuccess(message);
+        setInterval(() => {
+          navigate("/login");
+        }, 2000);
+      } else if (error) {
+        const detail = error?.details[0].message;
+        handleError(detail);
+      } else if (!success) {
+        handleError(message);
+      }
       console.log(result);
     } catch (err) {
       handleError(err);
