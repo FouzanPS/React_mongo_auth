@@ -4,8 +4,7 @@ import { ToastContainer } from "react-toastify";
 import { handleError, handleSuccess } from "../../util";
 
 function Signup() {
-  const [signupInfo, setSignupInfo] = useState({
-    name: "",
+  const [loginInfo, setloginInfo] = useState({
     email: "",
     password: "",
   });
@@ -15,32 +14,34 @@ function Signup() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     console.log(name, value);
-    const copySignupInfo = { ...signupInfo };
-    copySignupInfo[name] = value;
-    setSignupInfo(copySignupInfo);
+    const copyLoginInfo = { ...loginInfo };
+    copyLoginInfo[name] = value;
+    setloginInfo(copyLoginInfo);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, email, password } = signupInfo;
-    if (!name || !email || !password) {
-      return handleError("name, email and password are required");
+    const { email, password } = loginInfo;
+    if (!email || !password) {
+      return handleError("email and password are required");
     }
     try {
-      const url = `http://localhost:3000/auth/signup`;
+      const url = `http://localhost:3000/auth/login`;
       const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(signupInfo),
+        body: JSON.stringify(loginInfo),
       });
       const result = await response.json();
-      const { message, success, error } = result;
+      const { message, success, jwttoken, name, error } = result;
       if (success) {
+        localStorage.setItem("token", jwttoken);
+        localStorage.setItem("userName", name);
         handleSuccess(message);
         setInterval(() => {
-          navigate("/login");
+          navigate("/home");
         }, 2000);
       } else if (error) {
         const detail = error?.details[0].message;
@@ -69,10 +70,10 @@ function Signup() {
             <div className="flex flex-col items-center">
               <div className="text-center">
                 <h1 className="text-2xl xl:text-4xl font-extrabold text-blue-900">
-                  Sign up
+                  Login
                 </h1>
                 <p className="text-[12px] text-gray-500">
-                  Enter your details to create your account
+                  Enter your details to Login to your account
                 </p>
               </div>
               <form className="w-full" onSubmit={handleSubmit}>
@@ -83,7 +84,7 @@ function Signup() {
                       autoFocus
                       type="email"
                       name="email"
-                      value={signupInfo.email}
+                      value={loginInfo.email}
                       onChange={handleChange}
                       placeholder="Enter your email"
                       required
@@ -92,7 +93,7 @@ function Signup() {
                       className="w-full px-5 py-3 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                       type="password"
                       name="password"
-                      value={signupInfo.password}
+                      value={loginInfo.password}
                       onChange={handleChange}
                       placeholder="Password"
                       required
@@ -113,13 +114,13 @@ function Signup() {
                         <circle cx="8.5" cy="7" r="4" />
                         <path d="M20 8v6M23 11h-6" />
                       </svg>
-                      <span className="ml-3">Sign Up</span>
+                      <span className="ml-3">Login</span>
                     </button>
                     <p className="mt-6 text-xs text-gray-600 text-center">
-                      Already have an account?{" "}
-                      <a href="/login">
+                      Don't have an account?{" "}
+                      <a href="/signup">
                         <span className="text-blue-900 font-semibold">
-                          Login
+                          Sign up
                         </span>
                       </a>
                     </p>
