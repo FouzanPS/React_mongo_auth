@@ -1,2 +1,2 @@
-# Email: test@gmail.com
-# password: 12345
+- Email: test@gmail.com
+- password: 12345
